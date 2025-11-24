@@ -3,6 +3,8 @@ import 'home_page.dart';
 import 'favourites_page.dart';
 import 'messages_page.dart';
 import 'profile_page.dart';
+import 'search_page.dart';
+
 
 void main() {
   runApp(const UniMarketApp());
@@ -39,6 +41,7 @@ class _MainNavigationState extends State<MainNavigation> {
     FavouritesPage(),
     MessagesPage(),
     ProfilePage(),
+    SearchPage(),
   ];
 
   void _onItemTapped(int index) {
