@@ -38,7 +38,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _pages = const [
     LoginScreen(),
-    RegisterScreen()
+    RegisterScreen(),
     HomePage(),
     FavouritesPage(),
     MessagesPage(),
