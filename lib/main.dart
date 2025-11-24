@@ -3,6 +3,8 @@ import 'home_page.dart';
 import 'favourites_page.dart';
 import 'messages_page.dart';
 import 'profile_page.dart';
+import 'login_screen.dart';
+import 'register_screen.dart';
 
 void main() {
   runApp(const UniMarketApp());
@@ -35,6 +37,8 @@ class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
+    LoginScreen(),
+    RegisterScreen()
     HomePage(),
     FavouritesPage(),
     MessagesPage(),
@@ -58,6 +62,8 @@ class _MainNavigationState extends State<MainNavigation> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.login), label: 'Login'),
+          BottomNavigationBarItem(icon: Icon(Icons.app_registration), label: 'Register'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Favourites'),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
