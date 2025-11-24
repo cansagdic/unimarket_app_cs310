@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'products.dart';
 import 'product.dart';
+import 'chat_screen.dart'; // ChatScreen'i kullanmak için eklendi
+import 'package:intl/intl.dart'; // Tarih formatı için eklendi
 
 class FavouritesPage extends StatefulWidget {
   const FavouritesPage({super.key});
@@ -93,7 +95,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
 
                             const SizedBox(height: 10),
 
-                            // -------- Contact Seller --------
+                            // -------- Contact Seller (GÜNCELLENDİ) --------
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.black87,
@@ -104,8 +106,23 @@ class _FavouritesPageState extends State<FavouritesPage> {
                                 ),
                               ),
                               onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Contacting seller...")),
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatScreen(
+                                      receiverName: product.seller,
+                                      receiverId: product.seller,
+                                      avatarPath: null,
+                                      initialMessages: [
+                                        {
+                                          // 🎯 GÜNCELLENDİ: Tarih ve saat formatı eklendi.
+                                          'text': DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+                                          'isMe': false,
+                                          'isDate': true,
+                                        }
+                                      ],
+                                    ),
+                                  ),
                                 );
                               },
                               child: const Text(

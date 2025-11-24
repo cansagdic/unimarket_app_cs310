@@ -26,7 +26,8 @@ class MessagesPage extends StatelessWidget {
               'isMe': false,
             },
             {
-              'text': 'Nov 30, 2025, 10:40 AM',
+              // 🎯 GÜNCELLENDİ: Saati 10:40 AM olarak ayarlandı.
+              'text': 'Nov 30, 2025, 10:40 AM', 
               'isDate': true,
             },
             {
@@ -43,7 +44,8 @@ class MessagesPage extends StatelessWidget {
           'avatar': null,
           'messages': [
             {
-              'text': 'Nov 30, 2025, 11:31 AM',
+              // 🎯 GÜNCELLENDİ: Saati 11:41 AM olarak ayarlandı.
+              'text': 'Nov 30, 2025, 11:41 AM',
               'isDate': true,
             },
             {
@@ -69,6 +71,7 @@ class MessagesPage extends StatelessWidget {
           'avatar': 'assets/images/sude_profile.png',
           'messages': [
             {
+              // Saati 9:41 AM olarak kaldı.
               'text': 'Nov 30, 2025, 9:41 AM',
               'isDate': true,
             },
@@ -155,11 +158,13 @@ class MessagesPage extends StatelessWidget {
                 ),
               ),
               onTap: () {
+                // ChatScreen'e yönlendirme
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => ChatScreen(
-                      userName: name,
+                      receiverName: name, 
+                      receiverId: name,   
                       avatarPath: avatarPath,
                       initialMessages:
                           (c['messages'] as List<Map<String, dynamic>>),

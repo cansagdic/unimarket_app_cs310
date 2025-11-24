@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  final String userName;
+  // GÜNCEL PARAMETRELER
+  final String receiverName;
+  final String receiverId;
   final String? avatarPath;
   final List<Map<String, dynamic>> initialMessages;
 
   const ChatScreen({
     super.key,
-    required this.userName,
+    required this.receiverName,
+    required this.receiverId,
     this.avatarPath,
     required this.initialMessages,
   });
@@ -80,8 +83,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   : null,
               child: widget.avatarPath == null
                   ? Text(
-                      widget.userName.isNotEmpty
-                          ? widget.userName[0]
+                      // receiverName kullanıldı
+                      widget.receiverName.isNotEmpty
+                          ? widget.receiverName[0]
                           : '?',
                     )
                   : null,
@@ -91,7 +95,8 @@ class _ChatScreenState extends State<ChatScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.userName,
+                  // receiverName kullanıldı
+                  widget.receiverName,
                   style: theme.textTheme.bodyMedium
                       ?.copyWith(fontWeight: FontWeight.w600),
                 ),
@@ -192,8 +197,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     avatarWidget = CircleAvatar(
                       radius: 12,
                       child: Text(
-                        widget.userName.isNotEmpty
-                            ? widget.userName[0]
+                        // receiverName kullanıldı
+                        widget.receiverName.isNotEmpty
+                            ? widget.receiverName[0]
                             : '?',
                       ),
                     );
@@ -263,7 +269,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             ),
                           ),
-                          Icon(
+                          const Icon(
                             Icons.mic_none,
                             size: 20,
                           ),

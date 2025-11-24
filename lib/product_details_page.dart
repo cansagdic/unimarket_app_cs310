@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'products.dart';
 import 'product.dart';
+import 'chat_screen.dart'; 
+import 'package:intl/intl.dart'; 
 
 class ProductDetailsPage extends StatefulWidget {
   final String imagePath;
@@ -150,7 +152,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
             const SizedBox(height: 20),
 
-            // ===================== CONTACT BUTTON =====================
+            // ===================== CONTACT BUTTON (GÜNCELLENDİ) =====================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -162,8 +164,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                 ),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Contacting seller…")),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                        receiverName: widget.seller,
+                        receiverId: widget.seller,
+                        avatarPath: null,
+                        initialMessages: [
+                          {
+                            // 🎯 GÜNCELLENDİ: Tarih ve saat formatı eklendi.
+                            'text': DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+                            'isMe': false,
+                            'isDate': true,
+                          }
+                        ],
+                      ),
+                    ),
                   );
                 },
                 child: const Text(
