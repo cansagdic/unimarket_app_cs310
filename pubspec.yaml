@@ -60,6 +60,7 @@ flutter:
     - assets/images/sofa.jpeg
     - assets/images/fridge.jpg
     - assets/images/chair.jpg
+    - assets/images/sude_profile.png
 
 
   # To add assets to your application, add an assets section, like this:
