@@ -1,8 +1,75 @@
 import 'package:flutter/material.dart';
 import 'upload_page.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  bool _isEditing = false;
+
+  late TextEditingController _nameController;
+  late TextEditingController _titleController;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(
+      text: 'Can Sağdıç (Student)',
+    );
+    _titleController = TextEditingController(
+      text: 'Senior Computer Science and Engineering Student',
+    );
+  }
+
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  void _enterEditMode() {
+    setState(() {
+      _isEditing = true;
+    });
+  }
+
+  void _cancelEdit() {
+    // İstersen burada eski değerleri geri yükleyebilirsin
+    setState(() {
+      _isEditing = false;
+    });
+  }
+
+  void _saveEdit() {
+    // Normalde validation + backend kaydı olur
+    if (_nameController.text.trim().isEmpty ||
+        _titleController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Name and title cannot be empty'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isEditing = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Profile updated successfully'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +87,13 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 20),
+
             // Profile Image
             const CircleAvatar(
               radius: 50,
@@ -32,42 +101,104 @@ class ProfilePage extends StatelessWidget {
               child: Icon(Icons.person, size: 60, color: Colors.white),
             ),
             const SizedBox(height: 16),
-            // Name
-            const Text(
-              'Can Sağdıç (Student)',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Subtitle
-            const Text(
-              'Senior Computer Science and Engineering Student',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Edit Profile Button
-            OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+
+            // ----- VIEW MODE vs EDIT MODE -----
+            if (!_isEditing) ...[
+              // VIEW MODE
+              Text(
+                _nameController.text,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
-                side: const BorderSide(color: Colors.grey),
               ),
-              child: const Text(
-                'Edit Profile',
-                style: TextStyle(color: Colors.black),
+              const SizedBox(height: 8),
+              Text(
+                _titleController.text,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
               ),
-            ),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: _enterEditMode,
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  side: const BorderSide(color: Colors.grey),
+                ),
+                child: const Text(
+                  'Edit Profile',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ] else ...[
+              // EDIT MODE
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Full Name',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _nameController,
+                      decoration: _inputDecoration(),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Title',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _titleController,
+                      decoration: _inputDecoration(),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: _cancelEdit,
+                          child: const Text('Cancel'),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: _saveEdit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text('Save'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
             const SizedBox(height: 24),
             const Divider(thickness: 2, color: Colors.black),
             const SizedBox(height: 16),
+
             // My Listings Header
             const Text(
               'My Listings',
@@ -79,6 +210,7 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
+
             // Empty State Text
             const Text(
               'You haven’t listed\nanything yet',
@@ -90,6 +222,7 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
+
             // List Item Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -100,11 +233,13 @@ class ProfilePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const UploadPage()),
+                      MaterialPageRoute(
+                        builder: (context) => const UploadPage(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2D2D2D), // Dark grey/black
+                    backgroundColor: const Color(0xFF2D2D2D),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -119,6 +254,7 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(height: 24),
             const Divider(thickness: 2, color: Colors.black),
             const SizedBox(height: 24),
+
             // Settings List
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -164,4 +300,23 @@ class ProfilePage extends StatelessWidget {
       dense: true,
     );
   }
+
+  InputDecoration _inputDecoration() {
+    return InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
+        filled: true,
+        fillColor: const Color(0xfff5f5f5),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: const BorderSide(color: Colors.black12),
+        ),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6),
+            borderSide: const BorderSide(color: Colors.black87),
+              ),
+                  );
+          }
 }
