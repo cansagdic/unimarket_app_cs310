@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "717526307758",
+    "project_id": "unimarket-app-cs310",
+    "storage_bucket": "unimarket-app-cs310.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717526307758:android:ed837516ac56ff81536e3f",
+        "android_client_info": {
+          "package_name": "com.example.reshelf_app_cs310"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHrTcXeOA5t-JHOhbfVoXQuSqOpTRi7Tw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

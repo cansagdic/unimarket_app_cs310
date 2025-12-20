@@ -1,3 +1,7 @@
+import org.gradle.api.tasks.Delete
+import org.gradle.api.file.Directory
+
+// Needed for Google Services plugin when plugins {} DSL is not present in this template
 allprojects {
     repositories {
         google()
@@ -15,6 +19,7 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
 }

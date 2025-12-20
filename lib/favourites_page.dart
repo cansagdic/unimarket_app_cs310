@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'products.dart';
 import 'product.dart';
-import 'chat_screen.dart'; // ChatScreen'i kullanmak için eklendi
-import 'package:intl/intl.dart'; // Tarih formatı için eklendi
+import 'chat_screen.dart';
+import 'package:intl/intl.dart';
 
 class FavouritesPage extends StatefulWidget {
   const FavouritesPage({super.key});
