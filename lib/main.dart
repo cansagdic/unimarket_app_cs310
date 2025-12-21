@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'firebase_options.dart';
 import 'home_page.dart';
 import 'favourites_page.dart';
 import 'messages_page.dart';
@@ -15,7 +15,9 @@ import 'screens/auth/login_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const UniMarketApp());
 }
 
@@ -54,7 +56,7 @@ class AuthGate extends StatelessWidget {
           );
         }
         if (auth.user == null) {
-          return const LoginScreen(); // Login ekranından register'a geçeceğiz
+          return const LoginScreen();
         }
         return const MainNavigation();
       },

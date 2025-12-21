@@ -22,10 +22,13 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Tarih formatı ve diğer yerelleştirme işlemleri için eklendi.
-  intl: ^0.18.1 # Güncel bir sürüm kullandım.
+  intl: ^0.18.1
 
   cupertino_icons: ^1.0.8
+  cloud_firestore: ^6.1.1
+  provider: ^6.1.5+1
+  firebase_core: ^4.3.0
+  firebase_auth: ^6.1.3
 
 dev_dependencies:
   flutter_test:
