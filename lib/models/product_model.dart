@@ -7,6 +7,7 @@ class Product {
   final String description;
   final String imageUrl;
   final String sellerId;
+  final String sellerName;
   final DateTime createdAt;
 
   Product({
@@ -16,6 +17,7 @@ class Product {
     required this.description,
     required this.imageUrl,
     required this.sellerId,
+    required this.sellerName,
     required this.createdAt,
   });
 
@@ -29,6 +31,7 @@ class Product {
       description: data['description'] ?? '',
       imageUrl: data['imageUrl'] ?? 'https://via.placeholder.com/150',
       sellerId: data['createdBy'] ?? '',
+      sellerName: data['sellerName'] ?? 'UniMarket Seller',
       // Safely convert Timestamp to DateTime
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -42,6 +45,7 @@ class Product {
       'description': description,
       'imageUrl': imageUrl,
       'createdBy': sellerId,
+      'sellerName': sellerName,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
