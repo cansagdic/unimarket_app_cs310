@@ -39,14 +39,14 @@ class MessagesPage extends StatelessWidget {
                 final chats = snapshot.data ?? [];
 
                 if (chats.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.chat_bubble_outline, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                        SizedBox(height: 16),
-                        Text('No messages yet'),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 16),
+                        const Text('No messages yet'),
+                        const SizedBox(height: 8),
                         Text(
                           'Start a conversation by contacting a seller!',
                           style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),

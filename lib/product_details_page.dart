@@ -111,7 +111,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             // ===================== SELLER =====================
             Text(
               "Posted by: ${widget.product.sellerName}",
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
