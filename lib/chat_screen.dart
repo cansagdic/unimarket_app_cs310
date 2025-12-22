@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'services/chat_service.dart';
+import 'models/message_model.dart';
 
 class ChatScreen extends StatefulWidget {
-  // GÜNCEL PARAMETRELER
+  final String chatId;
   final String receiverName;
   final String receiverId;
-  final String? avatarPath;
-  final List<Map<String, dynamic>> initialMessages;
 
   const ChatScreen({
     super.key,
+    required this.chatId,
     required this.receiverName,
     required this.receiverId,
-    this.avatarPath,
-    required this.initialMessages,
   });
 
   @override
@@ -21,53 +22,30 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  late List<_ChatItem> _items;
+  final ChatService _chatService = ChatService();
 
-  @override
-  void initState() {
-    super.initState();
-    _items = widget.initialMessages
-        .map(
-          (m) => _ChatItem(
-            text: m['text'] as String,
-            isMe: (m['isMe'] as bool?) ?? false,
-            isDate: (m['isDate'] as bool?) ?? false,
-          ),
-        )
-        .toList();
-  }
-
-  void _sendMessage() {
+  void _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    setState(() {
-      _items.add(
-        _ChatItem(
-          text: text,
-          isMe: true,
-          isDate: false,
-        ),
-      );
-    });
+    final authProvider = context.read<AuthProvider>();
+    if (authProvider.user == null) return;
 
     _controller.clear();
-  }
 
-  // Son gelen karşı taraf mesajının index'ini bul
-  int? _lastIncomingIndex() {
-    for (int i = _items.length - 1; i >= 0; i--) {
-      if (!_items[i].isDate && !_items[i].isMe) {
-        return i;
-      }
-    }
-    return null;
+    await _chatService.sendMessage(
+      chatId: widget.chatId,
+      senderId: authProvider.user!.uid,
+      senderName: authProvider.user!.displayName ?? 'User',
+      text: text,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final lastIncoming = _lastIncomingIndex();
+    final authProvider = context.watch<AuthProvider>();
+    final currentUserId = authProvider.user?.uid ?? '';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -78,32 +56,19 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: widget.avatarPath != null
-                  ? AssetImage(widget.avatarPath!)
-                  : null,
-              child: widget.avatarPath == null
-                  ? Text(
-                      // receiverName kullanıldı
-                      widget.receiverName.isNotEmpty
-                          ? widget.receiverName[0]
-                          : '?',
-                    )
-                  : null,
+              child: Text(
+                widget.receiverName.isNotEmpty ? widget.receiverName[0] : '?',
+              ),
             ),
             const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  // receiverName kullanıldı
                   widget.receiverName,
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.w600),
+                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
-                Text(
-                  'Active',
-                  style: theme.textTheme.bodySmall,
-                ),
+                Text('Active', style: theme.textTheme.bodySmall),
               ],
             ),
           ],
@@ -112,150 +77,66 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: _items.length,
-              itemBuilder: (context, index) {
-                final item = _items[index];
+            child: StreamBuilder<List<Message>>(
+              stream: _chatService.getChatMessages(widget.chatId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                if (item.isDate) {
-                  // Ortadaki tarih/saat yazısı
-                  return Center(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        item.text,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
+                final messages = snapshot.data ?? [];
+
+                if (messages.isEmpty) {
+                  return const Center(
+                    child: Text('No messages yet. Say hello!'),
                   );
                 }
 
-                final isMe = item.isMe;
+                return ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+                    final isMe = message.senderId == currentUserId;
 
-                // Benim mesajlarım (sağ tarafta, siyah)
-                if (isMe) {
-                  final bgColor = Colors.black87;
-                  final textColor = Colors.white;
-
-                  final radius = BorderRadius.only(
-                    topLeft: const Radius.circular(16),
-                    topRight: const Radius.circular(16),
-                    bottomLeft: const Radius.circular(16),
-                    bottomRight: const Radius.circular(0),
-                  );
-
-                  return Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      margin:
-                          const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        borderRadius: radius,
-                      ),
-                      child: Text(
-                        item.text,
-                        style: TextStyle(color: textColor),
-                      ),
-                    ),
-                  );
-                }
-
-                // Karşı taraf mesajları (solda)
-                final bgColor = Colors.grey.shade300;
-                final textColor = Colors.black87;
-
-                final radius = BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: const Radius.circular(0),
-                  bottomRight: const Radius.circular(16),
-                );
-
-                // Sadece son gelen mesajda avatar göster
-                final bool showAvatar = lastIncoming == index;
-
-                Widget avatarWidget;
-                if (!showAvatar) {
-                  avatarWidget = const SizedBox(width: 24);
-                } else {
-                  if (widget.avatarPath != null) {
-                    avatarWidget = CircleAvatar(
-                      radius: 12,
-                      backgroundImage:
-                          AssetImage(widget.avatarPath!),
-                    );
-                  } else {
-                    avatarWidget = CircleAvatar(
-                      radius: 12,
-                      child: Text(
-                        // receiverName kullanıldı
-                        widget.receiverName.isNotEmpty
-                            ? widget.receiverName[0]
-                            : '?',
-                      ),
-                    );
-                  }
-                }
-
-                return Align(
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            right: 6.0, top: 8),
-                        child: avatarWidget,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 4),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
+                    return Align(
+                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: bgColor,
-                          borderRadius: radius,
+                          color: isMe ? Colors.black87 : Colors.grey.shade300,
+                          borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(16),
+                            topRight: const Radius.circular(16),
+                            bottomLeft: Radius.circular(isMe ? 16 : 0),
+                            bottomRight: Radius.circular(isMe ? 0 : 16),
+                          ),
                         ),
                         child: Text(
-                          item.text,
-                          style: TextStyle(color: textColor),
+                          message.text,
+                          style: TextStyle(
+                            color: isMe ? Colors.white : Colors.black87,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
             ),
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0, vertical: 4.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: Row(
                 children: [
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.grey.shade300,
-                        ),
+                        border: Border.all(color: Colors.grey.shade300),
                       ),
                       child: Row(
                         children: [
@@ -269,29 +150,11 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             ),
                           ),
-                          const Icon(
-                            Icons.mic_none,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.emoji_emotions_outlined,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.image_outlined,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 4),
                           IconButton(
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             onPressed: _sendMessage,
-                            icon: const Icon(
-                              Icons.send,
-                              size: 20,
-                            ),
+                            icon: const Icon(Icons.send, size: 20),
                           ),
                         ],
                       ),
@@ -305,16 +168,4 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
-}
-
-class _ChatItem {
-  final String text;
-  final bool isMe;
-  final bool isDate;
-
-  _ChatItem({
-    required this.text,
-    this.isMe = false,
-    this.isDate = false,
-  });
 }

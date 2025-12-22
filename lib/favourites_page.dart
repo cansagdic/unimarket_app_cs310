@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'products.dart';
-import 'product.dart';
-import 'chat_screen.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'models/product_model.dart';
+import 'providers/auth_provider.dart';
+import 'providers/product_provider.dart';
+import 'services/favourite_service.dart';
+import 'product_details_page.dart';
 
 class FavouritesPage extends StatefulWidget {
   const FavouritesPage({super.key});
@@ -12,147 +14,81 @@ class FavouritesPage extends StatefulWidget {
 }
 
 class _FavouritesPageState extends State<FavouritesPage> {
+  final FavouriteService _favouriteService = FavouriteService();
+
   @override
   Widget build(BuildContext context) {
-    // Get only favorited products
-    final List<Product> favouriteProducts =
-        products.where((p) => p.isFavorite).toList();
+    final authProvider = context.watch<AuthProvider>();
+    final productProvider = context.watch<ProductProvider>();
+    final userId = authProvider.user?.uid;
+
+    if (userId == null) {
+      return const Scaffold(
+        body: Center(child: Text("Please log in to see favorites")),
+      );
+    }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Favorites",
-          style: TextStyle(color: Colors.black),
-        ),
+        title: const Text("Favorites", style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,
       ),
+      body: StreamBuilder<List<String>>(
+        stream: _favouriteService.getFavouriteProductIds(userId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-      body: favouriteProducts.isEmpty
-          ? const Center(
-              child: Text(
-                "No favorites yet",
-                style: TextStyle(fontSize: 18, color: Colors.black54),
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: favouriteProducts.length,
-              itemBuilder: (context, index) {
-                final product = favouriteProducts[index];
+          final favIds = snapshot.data ?? [];
+          final favProducts = productProvider.products.where((p) => favIds.contains(p.id)).toList();
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 20),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
+          if (favProducts.isEmpty) {
+            return const Center(
+              child: Text("No favorites yet", style: TextStyle(fontSize: 18, color: Colors.black54)),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: favProducts.length,
+            itemBuilder: (context, index) {
+              final product = favProducts[index];
+
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ListTile(
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      product.imageUrl,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(Icons.image),
+                    ),
                   ),
-
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ---------------- IMAGE ----------------
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          product.imagePath,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-
-                      const SizedBox(width: 16),
-
-                      // ---------------- DETAILS ----------------
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              product.seller,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.black54),
-                            ),
-
-                            const SizedBox(height: 4),
-
-                            Text(
-                              product.title,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-
-                            const SizedBox(height: 4),
-
-                            Text(
-                              product.price,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            // -------- Contact Seller (GÜNCELLENDİ) --------
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black87,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 10),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ChatScreen(
-                                      receiverName: product.seller,
-                                      receiverId: product.seller,
-                                      avatarPath: null,
-                                      initialMessages: [
-                                        {
-                                          // 🎯 GÜNCELLENDİ: Tarih ve saat formatı eklendi.
-                                          'text': DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
-                                          'isMe': false,
-                                          'isDate': true,
-                                        }
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                "Contact Seller",
-                                style:
-                                    TextStyle(fontSize: 14, color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // ---------------- HEART BUTTON (remove from favorites) ----------------
-                      IconButton(
-                        icon: const Icon(
-                          Icons.favorite,
-                          size: 32,
-                          color: Colors.red,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            product.isFavorite = false;   // remove favorite
-                          });
-                        },
-                      ),
-                    ],
+                  title: Text(product.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(product.price),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.favorite, color: Colors.red),
+                    onPressed: () => _favouriteService.toggleFavourite(userId, product.id),
                   ),
-                );
-              },
-            ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => ProductDetailsPage(product: product)),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
