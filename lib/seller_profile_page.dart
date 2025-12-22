@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
+import 'models/product_model.dart';
+import 'services/database_service.dart';
+import 'product_details_page.dart';
 
 class SellerProfileScreen extends StatelessWidget {
-  const SellerProfileScreen({super.key});
+  final String sellerId;
+  final String sellerName;
+
+  const SellerProfileScreen({
+    super.key,
+    required this.sellerId,
+    required this.sellerName,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(sellerName),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -16,48 +30,35 @@ class SellerProfileScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 24),
 
-              // Profil fotoğrafı
-              const CircleAvatar(
+              // Profile photo
+              CircleAvatar(
                 radius: 55,
-                backgroundImage: NetworkImage(
-                  "https://i.pravatar.cc/300?img=47", // örnek foto
+                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: Text(
+                  sellerName.isNotEmpty ? sellerName[0].toUpperCase() : '?',
+                  style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                 ),
               ),
 
               const SizedBox(height: 12),
 
-              // İsim
-              const Text(
-                "Sude Nil Varlı",
-                style: TextStyle(
+              // Name
+              Text(
+                sellerName,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
 
-              const SizedBox(height: 4),
-
-              // Alt başlık
-              const Text(
-                "Senior Computer Science and Engineering Student",
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.black54,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
               const SizedBox(height: 20),
 
-              // Ayırıcı çizgi
-              Container(
-                height: 1,
-                color: Colors.black26,
-              ),
+              // Divider
+              Divider(color: Theme.of(context).dividerColor),
 
               const SizedBox(height: 16),
 
-              // Bölüm başlığı
+              // Section title
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -71,49 +72,44 @@ class SellerProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // Ürün listesi
+              // Product list from Firestore
               Expanded(
-                child: ListView(
-                  children: [
-                    _productCard(
-                      imageUrl:
-                      "https://images.pexels.com/photos/112811/pexels-photo-112811.jpeg",
-                      title: "Reading Lamp",
-                      price: "\$20",
-                    ),
-                    const SizedBox(height: 16),
-                    _productCard(
-                      imageUrl:
-                      "https://images.pexels.com/photos/279906/pexels-photo-279906.jpeg",
-                      title: "Suitcase",
-                      price: "\$90",
-                    ),
-                  ],
+                child: StreamBuilder<List<Product>>(
+                  stream: DatabaseService().getUserProducts(sellerId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    final products = snapshot.data ?? [];
+
+                    if (products.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No products yet',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      );
+                    }
+
+                    return ListView.separated(
+                      itemCount: products.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 16),
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return _productCard(
+                          context: context,
+                          product: product,
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-
-      // Alt navigation bar (Figma’daki gibi basit ikonlar)
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            top: BorderSide(color: Colors.black12),
-          ),
-        ),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(Icons.search, size: 26),
-              Icon(Icons.star_border, size: 26),
-              Icon(Icons.mail_outline, size: 26, color: Colors.deepPurple),
-              Icon(Icons.person_outline, size: 26),
             ],
           ),
         ),
@@ -121,46 +117,67 @@ class SellerProfileScreen extends StatelessWidget {
     );
   }
 
-  // Ürün kartı widget'ı
+  // Product card widget
   static Widget _productCard({
-    required String imageUrl,
-    required String title,
-    required String price,
+    required BuildContext context,
+    required Product product,
   }) {
-    return Row(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductDetailsPage(product: product),
+          ),
+        );
+      },
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.network(
-              imageUrl,
+              product.imageUrl,
               width: 110,
               height: 110,
               fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                width: 110,
+                height: 110,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: const Icon(Icons.image, size: 40),
+              ),
             ),
           ),
           const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product.title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                price,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87,
+                const SizedBox(height: 6),
+                Text(
+                  product.price,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
-            ],
-                      );
-    }
+        ],
+      ),
+    );
+  }
 }
+
