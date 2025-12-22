@@ -20,7 +20,9 @@ class ThemeProvider extends ChangeNotifier {
       _initialized = true;
       notifyListeners();
     } catch (e) {
-      print('Error loading theme: $e');
+
+      debugPrint('Error loading theme: $e');
+
       _initialized = true;
       notifyListeners();
     }
@@ -34,7 +36,8 @@ class ThemeProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_themeKey, _isDarkMode);
     } catch (e) {
-      print('Error saving theme: $e');
+      debugPrint('Error saving theme: $e');
+
     }
   }
 }

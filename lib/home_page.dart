@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'models/product_model.dart';
 import 'services/database_service.dart';
 import 'product_details_page.dart';
@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
                       hintText: 'Search',
                       prefixIcon: const Icon(Icons.search),
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                       contentPadding: const EdgeInsets.symmetric(vertical: 15),
                       border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -123,7 +123,7 @@ class HomePage extends StatelessWidget {
                                     errorBuilder: (ctx, error, stackTrace) {
                                       return Container(
                                         height: 150,
-                                        color: Colors.grey[300],
+                                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                                         child: const Icon(
                                             Icons.image_not_supported,
                                             size: 50),
@@ -149,7 +149,7 @@ class HomePage extends StatelessWidget {
                                         product.price,
                                         style: const TextStyle(
                                             fontSize: 16,
-                                            color: Colors.deepPurple,
+                                            color: Theme.of(context).colorScheme.primary,
                                             fontWeight: FontWeight.w600),
                                       ),
                                     ],

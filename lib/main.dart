@@ -6,8 +6,6 @@ import 'home_page.dart';
 import 'favourites_page.dart';
 import 'messages_page.dart';
 import 'profile_page.dart';
-import 'login_screen.dart';
-import 'register_screen.dart';
 import 'search_page.dart';
 
 import 'providers/auth_provider.dart';
@@ -43,6 +41,20 @@ class UniMarketApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.deepPurple,
                 brightness: Brightness.light,
+                surface: Colors.white,
+                onSurface: Colors.black,
+              ),
+              scaffoldBackgroundColor: Colors.white,
+              cardColor: Colors.white,
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                elevation: 0,
+              ),
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Colors.white,
+                selectedItemColor: Colors.deepPurple,
+                unselectedItemColor: Colors.black54,
               ),
               useMaterial3: true,
             ),
@@ -50,6 +62,20 @@ class UniMarketApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.deepPurple,
                 brightness: Brightness.dark,
+                surface: Colors.grey[850]!,
+                onSurface: Colors.white,
+              ),
+              scaffoldBackgroundColor: Colors.grey[900],
+              cardColor: Colors.grey[850],
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.grey[900],
+                foregroundColor: Colors.white,
+                elevation: 0,
+              ),
+              bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                backgroundColor: Colors.grey[900],
+                selectedItemColor: Colors.deepPurpleAccent,
+                unselectedItemColor: Colors.grey[400],
               ),
               useMaterial3: true,
             ),
@@ -108,9 +134,11 @@ class _MainNavigationState extends State<MainNavigation> {
   void initState() {
     super.initState();
     // Start listening to products when app starts
-    Future.microtask(() => 
-      context.read<ProductProvider>().listenToProducts()
-    );
+    Future.microtask(() {
+      if (mounted) {
+        context.read<ProductProvider>().listenToProducts();
+      }
+    });
   }
 
   void _onItemTapped(int index) {

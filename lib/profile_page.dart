@@ -83,20 +83,20 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'My Profile',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 28,
-            color: Colors.black,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         centerTitle: false,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: Theme.of(context).appBarTheme.foregroundColor),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -106,8 +106,8 @@ class _ProfilePageState extends State<ProfilePage> {
             // Profile Image
             const CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey,
-              child: Icon(Icons.person, size: 60, color: Colors.white),
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Icon(Icons.person, size: 60, color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 16),
 
@@ -119,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 8),
@@ -128,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
-                  color: Colors.black54,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),
               ),
               const SizedBox(height: 16),
@@ -138,11 +138,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  side: const BorderSide(color: Colors.grey),
+                  side: BorderSide(color: Theme.of(context).dividerColor),
                 ),
-                child: const Text(
+                child: Text(
                   'Edit Profile',
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                 ),
               ),
             ] else ...[
@@ -189,8 +189,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         ElevatedButton(
                           onPressed: _saveEdit,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -205,7 +205,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
 
             const SizedBox(height: 24),
-            const Divider(thickness: 2, color: Colors.black),
+            Divider(thickness: 2, color: Theme.of(context).dividerColor),
             const SizedBox(height: 16),
 
             // My Listings Header
@@ -215,7 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 fontStyle: FontStyle.italic,
-                color: Colors.black,
+                color: Theme.of(context).textTheme.headlineSmall?.color,
               ),
             ),
             const SizedBox(height: 16),
@@ -249,7 +249,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 20,
-                              color: Colors.black54,
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
                               fontWeight: FontWeight.w300,
                             ),
                           ),
@@ -311,7 +311,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2D2D2D),
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -331,7 +331,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -387,7 +387,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     );
                     
-                    if (confirmed == true && mounted) {
+                    if (confirmed == true && context.mounted) {
                       await context.read<AuthProvider>().logout();
                     }
                   },
@@ -442,14 +442,14 @@ class _ProfilePageState extends State<ProfilePage> {
           vertical: 14,
         ),
         filled: true,
-        fillColor: const Color(0xfff5f5f5),
+        fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: Colors.black12),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(6),
-            borderSide: const BorderSide(color: Colors.black87),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
               ),
                   );
           }

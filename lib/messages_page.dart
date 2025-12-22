@@ -15,10 +15,10 @@ class MessagesPage extends StatelessWidget {
     final chatService = ChatService();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
         elevation: 0,
         title: const Text('Messages'),
         centerTitle: true,
@@ -43,13 +43,13 @@ class MessagesPage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
+                        Icon(Icons.chat_bubble_outline, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
                         SizedBox(height: 16),
                         Text('No messages yet'),
                         SizedBox(height: 8),
                         Text(
                           'Start a conversation by contacting a seller!',
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
                         ),
                       ],
                     ),
@@ -83,7 +83,7 @@ class MessagesPage extends StatelessWidget {
                         ),
                         trailing: Text(
                           _formatTime(chat.lastMessageTime),
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color, fontSize: 12),
                         ),
                         onTap: () {
                           Navigator.push(

@@ -28,12 +28,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final userId = authProvider.user?.uid;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
         actions: [
           if (userId != null)
             StreamBuilder<bool>(
@@ -67,7 +67,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Image.network(
@@ -77,7 +77,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   fit: BoxFit.contain,
                   errorBuilder: (_, __, ___) => Container(
                     height: 260,
-                    color: Colors.grey[200],
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
                     child: const Icon(Icons.image, size: 100, color: Colors.grey),
                   ),
                 ),
@@ -113,7 +113,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               "Posted by: ${widget.product.sellerName}",
               style: const TextStyle(
                 fontSize: 16,
-                color: Colors.black54,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
             ),
 
@@ -124,7 +124,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black87,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -178,7 +178,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   "Contact Seller",
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -195,7 +195,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -221,14 +221,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
                   borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(12),
                   ),
                 ),
                 child: Text(
                   widget.product.description,
-                  style: const TextStyle(fontSize: 15, color: Colors.black87),
+                  style: TextStyle(fontSize: 15, color: Theme.of(context).textTheme.bodyMedium?.color),
                 ),
               ),
           ],

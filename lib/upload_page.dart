@@ -74,7 +74,7 @@ class _UploadPageState extends State<UploadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Upload your item',
@@ -82,10 +82,10 @@ class _UploadPageState extends State<UploadPage> {
             fontWeight: FontWeight.bold,
             fontSize: 28,
             fontStyle: FontStyle.italic,
-            color: Colors.black,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         centerTitle: false,
         automaticallyImplyLeading: false,
@@ -143,7 +143,7 @@ class _UploadPageState extends State<UploadPage> {
                 child: ElevatedButton(
                   onPressed: _uploading ? null : _uploadProduct,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2D2D2D),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -159,7 +159,7 @@ class _UploadPageState extends State<UploadPage> {
                         )
                       : const Text(
                           'Upload Item',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16),
                         ),
                 ),
               ),
@@ -195,7 +195,7 @@ class _UploadPageState extends State<UploadPage> {
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
-        color: Colors.black,
+        color: Theme.of(context).textTheme.bodyLarge?.color,
       ),
     );
   }
@@ -212,9 +212,9 @@ class _UploadPageState extends State<UploadPage> {
       validator: validator,
       decoration: InputDecoration(
         filled: true,
-        fillColor: const Color(0xFFEEEEEE),
+        fillColor: Theme.of(context).colorScheme.surfaceContainer,
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey),
+        hintStyle: TextStyle(color: Theme.of(context).hintColor),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide.none,
