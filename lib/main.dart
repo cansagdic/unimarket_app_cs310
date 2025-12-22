@@ -6,8 +6,6 @@ import 'home_page.dart';
 import 'favourites_page.dart';
 import 'messages_page.dart';
 import 'profile_page.dart';
-import 'login_screen.dart';
-import 'register_screen.dart';
 import 'search_page.dart';
 
 import 'providers/auth_provider.dart';

@@ -5,6 +5,7 @@ import 'providers/auth_provider.dart';
 import 'services/chat_service.dart';
 import 'services/favourite_service.dart';
 import 'chat_screen.dart';
+import 'seller_profile_page.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final Product product;
@@ -109,11 +110,45 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             const SizedBox(height: 10),
 
             // ===================== SELLER =====================
-            Text(
-              "Posted by: ${widget.product.sellerName}",
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
+            GestureDetector(
+              onTap: () {
+                // Don't navigate if it's your own product
+                if (authProvider.user?.uid == widget.product.sellerId) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('This is your own listing')),
+                  );
+                  return;
+                }
+                
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SellerProfileScreen(
+                      sellerId: widget.product.sellerId,
+                      sellerName: widget.product.sellerName,
+                    ),
+                  ),
+                );
+              },
+              child: Row(
+                children: [
+                  Text(
+                    "Posted by: ",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                  ),
+                  Text(
+                    widget.product.sellerName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ],
               ),
             ),
 
