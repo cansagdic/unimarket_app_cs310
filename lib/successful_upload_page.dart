@@ -29,7 +29,7 @@ class SuccessfulUploadPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               // Success Text
-              const Text(
+              Text(
                 'Your item has been\nuploaded successfully!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -54,7 +54,7 @@ class SuccessfulUploadPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Go to Profile',
                     style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16),
                   ),

@@ -116,7 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Text(
                           message.text,
                           style: TextStyle(
-                            color: isMe ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: isMe ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                       ),

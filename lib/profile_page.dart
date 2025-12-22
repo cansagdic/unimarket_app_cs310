@@ -85,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'My Profile',
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -104,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 20),
 
             // Profile Image
-            const CircleAvatar(
+            CircleAvatar(
               radius: 50,
               backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               child: Icon(Icons.person, size: 60, color: Theme.of(context).colorScheme.onSurfaceVariant),
@@ -116,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
               // VIEW MODE
               Text(
                 _nameController.text,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).textTheme.bodyLarge?.color,
@@ -126,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Text(
                 _titleController.text,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),
@@ -142,7 +142,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: Text(
                   'Edit Profile',
-                  style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
             ] else ...[
@@ -209,7 +209,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 16),
 
             // My Listings Header
-            const Text(
+            Text(
               'My Listings',
               style: TextStyle(
                 fontSize: 24,
@@ -244,7 +244,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       return Column(
                         children: [
                           const SizedBox(height: 20),
-                          const Text(
+                          Text(
                             'You haven\'t listed\nanything yet',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -311,20 +311,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'List Item',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 24),
-            const Divider(thickness: 2, color: Colors.black),
+            Divider(thickness: 2, color: Theme.of(context).dividerColor),
             const SizedBox(height: 24),
 
             // Settings List
@@ -387,7 +387,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     );
                     
-                    if (confirmed == true && context.mounted) {
+                    if (confirmed == true && mounted) {
                       await context.read<AuthProvider>().logout();
                     }
                   },

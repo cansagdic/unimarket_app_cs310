@@ -76,7 +76,7 @@ class _UploadPageState extends State<UploadPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Upload your item',
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -149,15 +149,15 @@ class _UploadPageState extends State<UploadPage> {
                     ),
                   ),
                   child: _uploading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         )
-                      : const Text(
+                      : Text(
                           'Upload Item',
                           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16),
                         ),
@@ -171,14 +171,14 @@ class _UploadPageState extends State<UploadPage> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2D2D2D),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Go Back',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16),
                   ),
                 ),
               ),
@@ -192,7 +192,7 @@ class _UploadPageState extends State<UploadPage> {
   Widget _buildLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
         color: Theme.of(context).textTheme.bodyLarge?.color,
@@ -212,7 +212,7 @@ class _UploadPageState extends State<UploadPage> {
       validator: validator,
       decoration: InputDecoration(
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainer,
+        fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
         hintText: hint,
         hintStyle: TextStyle(color: Theme.of(context).hintColor),
         border: OutlineInputBorder(

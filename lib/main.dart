@@ -6,6 +6,8 @@ import 'home_page.dart';
 import 'favourites_page.dart';
 import 'messages_page.dart';
 import 'profile_page.dart';
+import 'login_screen.dart';
+import 'register_screen.dart';
 import 'search_page.dart';
 
 import 'providers/auth_provider.dart';
@@ -64,6 +66,9 @@ class UniMarketApp extends StatelessWidget {
                 brightness: Brightness.dark,
                 surface: Colors.grey[850]!,
                 onSurface: Colors.white,
+                surfaceContainer: Colors.grey[800],
+                surfaceContainerLow: Colors.grey[850],
+                surfaceContainerHighest: Colors.grey[700],
               ),
               scaffoldBackgroundColor: Colors.grey[900],
               cardColor: Colors.grey[850],
@@ -73,9 +78,9 @@ class UniMarketApp extends StatelessWidget {
                 elevation: 0,
               ),
               bottomNavigationBarTheme: BottomNavigationBarThemeData(
-                backgroundColor: Colors.grey[900],
+                backgroundColor: Colors.black,
                 selectedItemColor: Colors.deepPurpleAccent,
-                unselectedItemColor: Colors.grey[400],
+                unselectedItemColor: Colors.white60,
               ),
               useMaterial3: true,
             ),
@@ -134,11 +139,9 @@ class _MainNavigationState extends State<MainNavigation> {
   void initState() {
     super.initState();
     // Start listening to products when app starts
-    Future.microtask(() {
-      if (mounted) {
-        context.read<ProductProvider>().listenToProducts();
-      }
-    });
+    Future.microtask(() => 
+      context.read<ProductProvider>().listenToProducts()
+    );
   }
 
   void _onItemTapped(int index) {
@@ -151,8 +154,7 @@ class _MainNavigationState extends State<MainNavigation> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: Colors.black54,
+        // Colors are now handled by the theme
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
