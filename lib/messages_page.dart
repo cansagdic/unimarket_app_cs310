@@ -1,107 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'services/chat_service.dart';
+import 'models/chat_model.dart';
 import 'chat_screen.dart';
 
 class MessagesPage extends StatelessWidget {
   const MessagesPage({super.key});
 
-  // Wireframe'e uygun konuşma listesi
-  List<Map<String, dynamic>> get _conversations => [
-        {
-          'name': 'Erdem Akay (Student)',
-          'lastMessage': 'You: Hey. Is this still available',
-          'time': '1 min',
-          'unread': 0,
-          'avatar': null,
-          'messages': [
-            {
-              'text': 'Nov 8, 2025, 3:03 PM',
-              'isDate': true,
-            },
-            {
-              'text': 'What is the price of the sofa?',
-              'isMe': true,
-            },
-            {
-              'text': 'Would you consider 50 dollars?',
-              'isMe': false,
-            },
-            {
-              // 🎯 GÜNCELLENDİ: Saati 10:40 AM olarak ayarlandı.
-              'text': 'Nov 30, 2025, 10:40 AM', 
-              'isDate': true,
-            },
-            {
-              'text': 'Hey. Is this still available?',
-              'isMe': true,
-            },
-          ],
-        },
-        {
-          'name': 'Baran Utku Güler (Student)',
-          'lastMessage': '*I also have a freezer if you ar...',
-          'time': '10 min',
-          'unread': 1, // sadece logic için, UI'da badge yok
-          'avatar': null,
-          'messages': [
-            {
-              // 🎯 GÜNCELLENDİ: Saati 11:41 AM olarak ayarlandı.
-              'text': 'Nov 30, 2025, 11:41 AM',
-              'isDate': true,
-            },
-            {
-              // SENİN MESAJIN
-              'text': 'I want to buy the sofa.',
-              'isMe': true,
-            },
-            {
-              'text': 'Great!',
-              'isMe': false,
-            },
-            {
-              'text': 'I also have a freezer if you are interested.',
-              'isMe': false,
-            },
-          ],
-        },
-        {
-          'name': 'Sude Nil Varli',
-          'lastMessage': 'You: Great, that works for me!',
-          'time': '2 hours',
-          'unread': 1,
-          'avatar': 'assets/images/sude_profile.png',
-          'messages': [
-            {
-              // Saati 9:41 AM olarak kaldı.
-              'text': 'Nov 30, 2025, 9:41 AM',
-              'isDate': true,
-            },
-            {
-              'text': 'Hi! Is this chair still available?',
-              'isMe': true,
-            },
-            {
-              'text': 'Yes, it is!',
-              'isMe': false,
-            },
-            {
-              'text': 'You can pick it up near the IC if that works.',
-              'isMe': false,
-            },
-            {
-              'text': 'I will be available after 4 pm.',
-              'isMe': false,
-            },
-            {
-              'text': 'Great, that works for me!',
-              'isMe': true,
-            },
-          ],
-        },
-      ];
-
   @override
   Widget build(BuildContext context) {
-    final conversations = _conversations;
+    final authProvider = context.watch<AuthProvider>();
+    final currentUserId = authProvider.user?.uid ?? '';
+    final chatService = ChatService();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -112,70 +23,96 @@ class MessagesPage extends StatelessWidget {
         title: const Text('Messages'),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: conversations.length,
-        itemBuilder: (context, index) {
-          final c = conversations[index];
-          final name = c['name'] as String;
-          final avatarPath = c['avatar'] as String?;
+      body: currentUserId.isEmpty
+          ? const Center(child: Text('Please log in to see messages'))
+          : StreamBuilder<List<Chat>>(
+              stream: chatService.getUserChats(currentUserId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          // SADECE Baran için kalın
-          final isBaran =
-              name.startsWith('Baran Utku Güler'); // tek bold o olacak
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
 
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            elevation: 0.5,
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundImage:
-                    avatarPath != null ? AssetImage(avatarPath) : null,
-                child: avatarPath == null
-                    ? Text(name.isNotEmpty ? name[0] : '?')
-                    : null,
-              ),
-              title: Text(
-                name,
-                style: TextStyle(
-                  fontWeight:
-                      isBaran ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              subtitle: Text(
-                c['lastMessage'] as String,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontWeight:
-                      isBaran ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              trailing: Text(
-                c['time'] as String,
-                style: TextStyle(
-                  fontWeight:
-                      isBaran ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              onTap: () {
-                // ChatScreen'e yönlendirme
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChatScreen(
-                      receiverName: name, 
-                      receiverId: name,   
-                      avatarPath: avatarPath,
-                      initialMessages:
-                          (c['messages'] as List<Map<String, dynamic>>),
+                final chats = snapshot.data ?? [];
+
+                if (chats.isEmpty) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text('No messages yet'),
+                        SizedBox(height: 8),
+                        Text(
+                          'Start a conversation by contacting a seller!',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
                     ),
-                  ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: chats.length,
+                  itemBuilder: (context, index) {
+                    final chat = chats[index];
+                    
+                    // Get the other participant's name
+                    String otherUserId = chat.participants.firstWhere(
+                      (id) => id != currentUserId,
+                      orElse: () => '',
+                    );
+                    String otherUserName = chat.participantNames[otherUserId] ?? 'User';
+
+                    return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      elevation: 0.5,
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          child: Text(otherUserName.isNotEmpty ? otherUserName[0] : '?'),
+                        ),
+                        title: Text(otherUserName),
+                        subtitle: Text(
+                          chat.lastMessage.isEmpty ? 'Start chatting!' : chat.lastMessage,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Text(
+                          _formatTime(chat.lastMessageTime),
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChatScreen(
+                                chatId: chat.id,
+                                receiverName: otherUserName,
+                                receiverId: otherUserId,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 );
               },
             ),
-          );
-        },
-      ),
     );
+  }
+
+  String _formatTime(DateTime time) {
+    final now = DateTime.now();
+    final diff = now.difference(time);
+
+    if (diff.inMinutes < 1) return 'now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} min';
+    if (diff.inHours < 24) return '${diff.inHours} hours';
+    return '${diff.inDays} days';
   }
 }

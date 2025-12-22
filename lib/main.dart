@@ -104,6 +104,15 @@ class _MainNavigationState extends State<MainNavigation> {
     ProfilePage(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    // Start listening to products when app starts
+    Future.microtask(() => 
+      context.read<ProductProvider>().listenToProducts()
+    );
+  }
+
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
   }

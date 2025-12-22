@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'models/product_model.dart';
+import 'providers/auth_provider.dart';
+import 'services/chat_service.dart';
+import 'services/favourite_service.dart';
+import 'chat_screen.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final Product product;
@@ -15,9 +20,13 @@ class ProductDetailsPage extends StatefulWidget {
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   bool detailsExpanded = true;
+  final FavouriteService _favouriteService = FavouriteService();
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final userId = authProvider.user?.uid;
+
     return Scaffold(
       backgroundColor: Colors.white,
 
@@ -25,6 +34,26 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
+        actions: [
+          if (userId != null)
+            StreamBuilder<bool>(
+              stream: _favouriteService.isFavourite(userId, widget.product.id),
+              builder: (context, snapshot) {
+                final isFav = snapshot.data ?? false;
+                return IconButton(
+                  icon: Icon(
+                    isFav ? Icons.favorite : Icons.favorite_border,
+                    color: isFav ? Colors.red : null,
+                  ),
+                  onPressed: () => _favouriteService.toggleFavourite(userId, widget.product.id),
+                );
+              },
+            ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () {},
+          ),
+        ],
       ),
 
       body: SingleChildScrollView(
@@ -101,10 +130,49 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Chat feature coming soon!')),
-                  );
+                onPressed: () async {
+                  final authProvider = context.read<AuthProvider>();
+                  if (authProvider.user == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please log in to contact seller')),
+                    );
+                    return;
+                  }
+                  
+                  // Don't allow messaging yourself
+                  if (authProvider.user!.uid == widget.product.sellerId) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('This is your own listing')),
+                    );
+                    return;
+                  }
+                  
+                  try {
+                    final chatService = ChatService();
+                    final chatId = await chatService.getOrCreateChat(
+                      userId1: authProvider.user!.uid,
+                      userName1: authProvider.user!.displayName ?? 'User',
+                      userId2: widget.product.sellerId,
+                      userName2: widget.product.sellerName,
+                    );
+                    
+                    if (!context.mounted) return;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatScreen(
+                          chatId: chatId,
+                          receiverName: widget.product.sellerName,
+                          receiverId: widget.product.sellerId,
+                        ),
+                      ),
+                    );
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Connection Error: $e')),
+                    );
+                  }
                 },
                 child: const Text(
                   "Contact Seller",
