@@ -29,7 +29,7 @@ class SuccessfulUploadPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               // Success Text
-              const Text(
+              Text(
                 'Your item has been\nuploaded successfully!',
                 textAlign: TextAlign.center,
                 style: TextStyle(

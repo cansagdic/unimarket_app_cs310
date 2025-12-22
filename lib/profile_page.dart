@@ -116,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
               // VIEW MODE
               Text(
                 _nameController.text,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).textTheme.bodyLarge?.color,
@@ -126,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Text(
                 _titleController.text,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),

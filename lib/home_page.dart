@@ -147,7 +147,7 @@ class HomePage extends StatelessWidget {
                                       const SizedBox(height: 4),
                                       Text(
                                         product.price,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             fontSize: 16,
                                             color: Theme.of(context).colorScheme.primary,
                                             fontWeight: FontWeight.w600),
