@@ -51,6 +51,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await context.read<AuthProvider>().register(
             _emailController.text.trim(),
             _passwordController.text,
+            displayName: _nameController.text.trim(),
           );
 
       if (!mounted) return;

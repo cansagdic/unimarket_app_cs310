@@ -1,25 +1,12 @@
 import 'package:flutter/material.dart';
-import 'products.dart';
-import 'product.dart';
-import 'chat_screen.dart'; 
-import 'package:intl/intl.dart'; 
+import 'models/product_model.dart';
 
 class ProductDetailsPage extends StatefulWidget {
-  final String imagePath;
-  final String title;
-  final String seller;
-  final String price;
-  final String condition;
-  final String description;
+  final Product product;
 
   const ProductDetailsPage({
     super.key,
-    required this.imagePath,
-    required this.title,
-    required this.seller,
-    required this.price,
-    required this.condition,
-    required this.description,
+    required this.product,
   });
 
   @override
@@ -28,15 +15,6 @@ class ProductDetailsPage extends StatefulWidget {
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   bool detailsExpanded = true;
-
-  Product get currentProduct {
-    return products.firstWhere((p) => p.title == widget.title);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,76 +33,36 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ===================== IMAGE + HEART BUTTON =====================
-            Stack(
-              children: [
-                ClipRRect(
+            // ===================== IMAGE =====================
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
                   borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Image.asset(
-                      widget.imagePath,
-                      height: 260,
-                      width: double.infinity,
-                      fit: BoxFit.contain,
-                    ),
+                ),
+                child: Image.network(
+                  widget.product.imageUrl,
+                  height: 260,
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 260,
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.image, size: 100, color: Colors.grey),
                   ),
                 ),
-
-                // FAVORITE BUTTON
-                Positioned(
-                  right: 10,
-                  top: 10,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        currentProduct.isFavorite = !currentProduct.isFavorite;
-                      });
-                    },
-                    child: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        currentProduct.isFavorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
 
             const SizedBox(height: 18),
 
             // ===================== PRODUCT TITLE =====================
             Text(
-              widget.title,
+              widget.product.title,
               style: const TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // ===================== CONDITION TAG =====================
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.green.shade100,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                widget.condition,
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.w600,
-                ),
               ),
             ),
 
@@ -132,7 +70,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
             // ===================== PRICE =====================
             Text(
-              widget.price,
+              widget.product.price,
               style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -143,7 +81,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
             // ===================== SELLER =====================
             Text(
-              "Posted by: ${widget.seller}",
+              "Posted by: ${widget.product.sellerName}",
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black54,
@@ -152,7 +90,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
             const SizedBox(height: 20),
 
-            // ===================== CONTACT BUTTON (GÜNCELLENDİ) =====================
+            // ===================== CONTACT BUTTON =====================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -164,23 +102,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        receiverName: widget.seller,
-                        receiverId: widget.seller,
-                        avatarPath: null,
-                        initialMessages: [
-                          {
-                            // 🎯 GÜNCELLENDİ: Tarih ve saat formatı eklendi.
-                            'text': DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
-                            'isMe': false,
-                            'isDate': true,
-                          }
-                        ],
-                      ),
-                    ),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Chat feature coming soon!')),
                   );
                 },
                 child: const Text(
@@ -236,7 +159,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                 ),
                 child: Text(
-                  widget.description,
+                  widget.product.description,
                   style: const TextStyle(fontSize: 15, color: Colors.black87),
                 ),
               ),

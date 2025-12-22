@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'providers/theme_provider.dart';
+import 'providers/product_provider.dart';
+import 'models/product_model.dart';
+import 'services/database_service.dart';
 import 'upload_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -18,11 +24,14 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    final authProvider = context.read<AuthProvider>();
+    final user = authProvider.user;
+    
     _nameController = TextEditingController(
-      text: 'Can Sağdıç (Student)',
+      text: user?.displayName ?? user?.email?.split('@').first ?? 'User',
     );
     _titleController = TextEditingController(
-      text: 'Senior Computer Science and Engineering Student',
+      text: user?.email ?? 'UniMarket User',
     );
   }
 
@@ -209,19 +218,82 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: Colors.black,
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 16),
 
-            // Empty State Text
-            const Text(
-              'You haven’t listed\nanything yet',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.black54,
-                fontWeight: FontWeight.w300,
-              ),
+            // My Listings - Real Data
+            Consumer<AuthProvider>(
+              builder: (context, authProvider, _) {
+                if (authProvider.user == null) {
+                  return const Center(child: Text('Please log in'));
+                }
+
+                return StreamBuilder<List<Product>>(
+                  stream: DatabaseService().getUserProducts(authProvider.user!.uid),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    final products = snapshot.data ?? [];
+
+                    if (products.isEmpty) {
+                      return Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          const Text(
+                            'You haven\'t listed\nanything yet',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black54,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      );
+                    }
+
+                    return Column(
+                      children: products.map((product) {
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12, left: 24, right: 24),
+                          child: ListTile(
+                            leading: Image.network(
+                              product.imageUrl,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 60),
+                            ),
+                            title: Text(product.title),
+                            subtitle: Text(product.price),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.blue),
+                                  onPressed: () => _showEditDialog(product),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () => _deleteProduct(product.id),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                );
+              },
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
 
             // List Item Button
             Padding(
@@ -281,8 +353,55 @@ class _ProfilePageState extends State<ProfilePage> {
                   const Divider(height: 1),
                   _buildSettingsItem('Help & Support'),
                   const Divider(height: 1),
+                  _buildDarkModeToggle(),
+                  const Divider(height: 1),
                   _buildSettingsItem('About Application'),
                 ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            
+            // Logout Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Logout'),
+                        content: const Text('Are you sure you want to logout?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Logout'),
+                          ),
+                        ],
+                      ),
+                    );
+                    
+                    if (confirmed == true && mounted) {
+                      await context.read<AuthProvider>().logout();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 40),
@@ -298,6 +417,21 @@ class _ProfilePageState extends State<ProfilePage> {
       trailing: const Icon(Icons.chevron_right, size: 16),
       onTap: () {},
       dense: true,
+    );
+  }
+
+  Widget _buildDarkModeToggle() {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        return ListTile(
+          title: const Text('Dark Mode', style: TextStyle(fontSize: 14)),
+          trailing: Switch(
+            value: themeProvider.isDarkMode,
+            onChanged: (_) => themeProvider.toggleTheme(),
+          ),
+          dense: true,
+        );
+      },
     );
   }
 
@@ -319,4 +453,112 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
                   );
           }
+
+  Future<void> _deleteProduct(String productId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Product'),
+        content: const Text('Are you sure you want to delete this product?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        await context.read<ProductProvider>().deleteProduct(productId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product deleted successfully')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error deleting product: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  void _showEditDialog(Product product) {
+    final titleController = TextEditingController(text: product.title);
+    final priceController = TextEditingController(text: product.price.replaceAll('\$', ''));
+    final descController = TextEditingController(text: product.description);
+    final imageController = TextEditingController(text: product.imageUrl);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Product'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(labelText: 'Title'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Price'),
+              ),
+              TextField(
+                controller: descController,
+                decoration: const InputDecoration(labelText: 'Description'),
+                maxLines: 3,
+              ),
+              TextField(
+                controller: imageController,
+                decoration: const InputDecoration(labelText: 'Image URL'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              try {
+                await context.read<ProductProvider>().updateProduct(
+                      productId: product.id,
+                      title: titleController.text,
+                      price: '\$${priceController.text}',
+                      description: descController.text,
+                      imageUrl: imageController.text,
+                    );
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Product updated successfully')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
 }

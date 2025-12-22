@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'models/product_model.dart';
 import 'services/database_service.dart';
 import 'product_details_page.dart';
@@ -10,9 +11,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize Database Service
     final dbService = DatabaseService();
-
+    
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -67,7 +67,6 @@ class HomePage extends StatelessWidget {
               Expanded(
                 child: StreamBuilder<List<Product>>(
                   stream: dbService.getProducts(),
-                  // Listening to real-time data
                   builder: (context, snapshot) {
                     // 1. Loading State
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -98,12 +97,7 @@ class HomePage extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ProductDetailsPage(
-                                  imagePath: product.imageUrl,
-                                  title: product.title,
-                                  seller: "Seller Info",
-                                  price: product.price,
-                                  condition: "Good",
-                                  description: product.description,
+                                  product: product,
                                 ),
                               ),
                             );
