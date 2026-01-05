@@ -50,6 +50,18 @@ To run the tests for the application, use the following command:
 flutter test
 ```
 
+### Test Descriptions
+
+#### 1. Unit Tests (`test/theme_provider_test.dart`)
+Tests the `ThemeProvider` class which manages the app's dark/light theme:
+- **Initial theme test**: Verifies that the app starts in light mode by default.
+- **Toggle theme test**: Ensures toggling switches from light to dark mode correctly.
+
+#### 2. Widget Tests (`test/home_page_widget_test.dart`)
+Tests the main navigation UI components:
+- **App bar title test**: Verifies the app bar displays "UniMarket" title correctly.
+- **Navigation bar items test**: Ensures all 5 navigation items (Home, Search, Favourites, Messages, Profile) are present with correct icons and labels.
+
 ## Known Limitations or Bugs
 
 - Minor UI inconsistencies may be observed on devices with varying screen sizes or aspect ratios, although responsive design efforts have been made.
