@@ -1,14 +1,70 @@
 # UniMarket
 
-UniMarket is a mobile application designed for university students to buy, sell, or give away used items
-within their campus community. The app provides an easy and secure way for students especially those who
-are graduating or moving to exchange items such as mini-fridges, books, desks, or clothes with other
-students on campus.
+UniMarket is a mobile marketplace application developed using Flutter and Firebase, specifically designed for university students. It provides a trusted platform for students to buy, sell, or exchange second-hand items within their community.
 
-## Team
-* Erdem Akay (30598) - Documentation & Submission Lead
-* Can Sağdıç (30580) - Integration & Repository Lead
-* Burak Bartu Yılmaz (32448) - Learning & Research Lead
-* Baran Utku Güler (31242) - Project Coordinator
-* Ertuğrul Soydal (32175) - Testing & Quality Ensurance Lead
-* Sude Nil Varlı (32191) - Presentation & Communication Lead
+## Overview
+
+- **Community Focus**: Tailored for university environments to foster trust.
+- **Real-Time**: Utilizes Firebase for real-time data synchronization.
+- **Cross-Platform**: Built with Flutter for seamless Android and iOS experiences.
+- **Secure**: Authentication via Firebase Auth ensures secure access.
+
+## Features
+
+- **User Authentication**: Secure Login and Registration with email.
+- **Product Marketplace**: Browse, search, and filter product listings in real-time.
+- **Listing Management**: Easily upload and manage items for sale.
+- **Favorites**: Save interesting items for later reference.
+- **Messaging**: Direct in-app communication between buyers and sellers.
+- **Profile Management**: customizable user profiles and seller views.
+
+## Setup and Run Instructions
+
+### Prerequisites
+- **Flutter SDK**: Version `^3.9.2`
+- **Git**
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/cansagdic/unimarket_app_cs310.git
+    cd unimarket_app_cs310
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    flutter pub get
+    ```
+
+3.  **Firebase Configuration:**
+    *   **Android:** Download `google-services.json` from your Firebase Console and place it in the `android/app/` directory.
+    *   **iOS:** Download `GoogleService-Info.plist` from your Firebase Console and place it in the `ios/Runner/` directory.
+
+4.  **Run the application:**
+    ```bash
+    flutter run
+    ```
+
+## Running Tests
+
+To run the tests for the application, use the following command:
+
+```bash
+flutter test
+```
+
+## Known Limitations or Bugs
+
+- Minor UI inconsistencies may be observed on devices with varying screen sizes or aspect ratios, although responsive design efforts have been made.
+- Please report any other issues found during testing.
+
+## Contributors
+
+- Ertuğrul Soydal
+- Baran
+- Bartu
+- Erdem
+
+---
+*Developed as part of the CS310 course.*
