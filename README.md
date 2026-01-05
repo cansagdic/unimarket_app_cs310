@@ -59,7 +59,7 @@ flutter test
 
 - Ertuğrul Soydal
 - Baran Utku Güler
-- Bartu Soydan
+- Bartu Yılmazz
 - Erdem Akay
 
 ---
