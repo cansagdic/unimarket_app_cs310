@@ -37,11 +37,7 @@ UniMarket is a mobile marketplace application developed using Flutter and Fireba
     flutter pub get
     ```
 
-3.  **Firebase Configuration:**
-    *   **Android:** Download `google-services.json` from your Firebase Console and place it in the `android/app/` directory.
-    *   **iOS:** Download `GoogleService-Info.plist` from your Firebase Console and place it in the `ios/Runner/` directory.
-
-4.  **Run the application:**
+3.  **Run the application:**
     ```bash
     flutter run
     ```
@@ -62,9 +58,9 @@ flutter test
 ## Contributors
 
 - Ertuğrul Soydal
-- Baran
-- Bartu
-- Erdem
+- Baran Utku Güler
+- Bartu Soydan
+- Erdem Akay
 
 ---
 *Developed as part of the CS310 course.*
